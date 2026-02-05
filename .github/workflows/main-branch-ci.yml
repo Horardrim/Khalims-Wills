@@ -23,6 +23,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: Install tools
+        run: |
+          sudo apt-get install -y lcov
+
       - name: Show gcc version
         run: |
           gcc -v
@@ -41,3 +45,13 @@ jobs:
           cmake -B build -S . -DENABLE_COVERAGE=ON
           cmake --build build -j$(nproc) -v
           build/bin/khalims-will.test
+          lcov -c -d build/CMakeFiles/khalims-will.test.dir/src/ -o coverage.info
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.info
+          fail_ci_if_error: true
+          name: khalims-will-lcov
+          codecov_yml_path: codecov.yml

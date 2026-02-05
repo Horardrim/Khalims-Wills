@@ -42,3 +42,6 @@
 
 # cmake temporary folder
 build
+
+# coverage file
+coverage.info
