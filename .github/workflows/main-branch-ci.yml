@@ -40,3 +40,4 @@ jobs:
         run: |
           cmake -B build -S . -DENABLE_COVERAGE=ON
           cmake --build build -j$(nproc) -v
+          build/bin/khalims-will.test
