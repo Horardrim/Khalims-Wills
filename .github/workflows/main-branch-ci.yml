@@ -1,0 +1,57 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI for main branch PR of project Khalims-Will 
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Install tools
+        run: |
+          sudo apt-get install -y lcov
+
+      - name: Show gcc version
+        run: |
+          gcc -v
+          g++ -v
+          cmake --version
+          ninja --version
+
+      - name: Cache apt packages
+        uses: actions/cache@v3
+        with:
+          path: /var/cache/apt/archives/*.deb
+          key: ${{ runner.os }}-apt-${{ hashFiles('apt-packages.txt') }}
+
+      - name: Build and test
+        run: |
+          cmake -B build -S . -DENABLE_COVERAGE=ON
+          cmake --build build -j$(nproc) -v
+          build/bin/khalims-will.test
+          lcov -c -d build/CMakeFiles/khalims-will.test.dir/src/ -o coverage.info
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.info
+          fail_ci_if_error: true
+          name: khalims-will-lcov
+          codecov_yml_path: codecov.yml
