@@ -11,7 +11,7 @@ void ArrayPartition::solution(const int & target, int * array, const int & lengt
 
     while (middle <= right)
     {
-        if (array[middle] <= target)
+        if (array[middle] < target)
         {
             int t = array[middle];
             array[middle] = array[left];
