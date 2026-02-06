@@ -4,8 +4,10 @@ name: CI for main branch PR of project Khalims-Will
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
+  # Triggers the workflow on push and pull request events but only for the main branch
   pull_request:
+    branches: [ main ]
+  push:
     branches: [ main ]
 
   # Allows you to run this workflow manually from the Actions tab
@@ -54,4 +56,4 @@ jobs:
           files: coverage.info
           fail_ci_if_error: true
           name: khalims-will-lcov
-          codecov_yml_path: codecov.yml
+          codecov_yml_path: .codecov.yml
