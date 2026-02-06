@@ -13,6 +13,7 @@ public:
 private:
     void normalCase();
     void emptyArrayCase();
+    void targetHitCase();
 };
 
 #endif
