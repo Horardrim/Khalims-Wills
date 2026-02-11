@@ -44,9 +44,9 @@ jobs:
 
       - name: Build and test
         run: |
-          cmake -B build -S . -DENABLE_COVERAGE=ON
+          cmake -B build -S . -DENABLE_COVERAGE=ON -DENABLE_ASAN=ON
           cmake --build build -j$(nproc) -v
-          build/bin/khalims-will.test
+          ctest --test-dir build --output-on-failure -V
           lcov -c -d build/CMakeFiles/khalims-will.test.dir/src/ -o coverage.info
 
       - name: Upload coverage
