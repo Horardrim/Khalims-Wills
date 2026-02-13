@@ -1,13 +1,28 @@
 cmake_minimum_required(VERSION 3.16)
 project(KHalims-WILL LANGUAGES CXX)
 
+include(CTest)
+enable_testing()
+
 # C++17 + 统一输出
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+option(ENABLE_COVERAGE "Enable gcov/lcov coverage" OFF)
+
+option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
+
 # 编译选项
 add_compile_options(-Wall -Wextra)
+
+if(ENABLE_COVERAGE)
+    add_compile_options(-g -O0 --coverage)
+endif()
+
+if(ENABLE_ASAN)
+    add_compile_options(-fsanitize=address)
+endif()
 
 # 1. 收集所有源文件（递归）
 file(GLOB_RECURSE SOURCES
@@ -27,11 +42,18 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_executable(khalims-will src/main.cxx ${SOURCES})
 add_executable(khalims-will.test test/main.cxx ${SOURCES} ${TEST_SOURCES})
 
-option(ENABLE_COVERAGE "Enable gcov/lcov coverage" OFF)
+add_test(NAME khalims_test COMMAND khalims-will.test)
+
+set_tests_properties(khalims_test PROPERTIES
+    FAIL_REGULAR_EXPRESSION "ERROR: AddressSanitizer"
+)
 
 if(ENABLE_COVERAGE)
-    # 2. 强制 Debug + 覆盖率标志
-    set(CMAKE_BUILD_TYPE Debug)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+    target_link_options(khalims-will.test PRIVATE --coverage)
+    target_link_options(khalims-will PRIVATE --coverage)
+endif()
+
+if(ENABLE_ASAN)
+    target_link_options(khalims-will.test PRIVATE -fsanitize=address)
+    target_link_options(khalims-will PRIVATE -fsanitize=address)
 endif()
