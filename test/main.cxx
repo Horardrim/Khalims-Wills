@@ -12,4 +12,3 @@ int main(int argc, char ** argv)
     std::cout << "Test Done." << std::endl;
     return 0;
 }
-

@@ -1,5 +1,4 @@
 #include "first_missing_positive_test.hxx"
-#include "../../src/ltcd/array/first_missing_positive.hxx"
 
 #include <assert.h>
 #include <vector>
